@@ -1,0 +1,302 @@
+<%
+/* ============================================================
+   LOGIN PAGE
+   Rendered by: GET /login  (src/routes/authRoutes.ts)
+   Layout:      src/views/layout.ejs  (injected via express-ejs-layouts)
+   Vars passed: error (string | null)
+   ============================================================ */
+%>
+
+<div class="login-wrap">
+
+    <div class="login-card">
+
+        <!-- ── Header ─────────────────────────────────────── -->
+        <div class="login-header">
+            <div class="login-logo">🩺</div>
+            <h1 class="login-title">MedGraph</h1>
+            <p class="login-subtitle">Medication Interaction Explorer</p>
+        </div>
+
+        <!-- ── Error banner ───────────────────────────────── -->
+        <% if (typeof error !== 'undefined' && error) { %>
+            <div class="alert alert-danger" role="alert">
+                <span>⚠</span>
+                <span><%= error %></span>
+            </div>
+        <% } %>
+
+        <!-- ── Success banner (after logout, etc.) ────────── -->
+        <% if (typeof success !== 'undefined' && success) { %>
+            <div class="alert alert-success" role="alert">
+                <span>✓</span>
+                <span><%= success %></span>
+            </div>
+        <% } %>
+
+        <!-- ── Login form ─────────────────────────────────── -->
+        <form action="/login" method="POST" class="login-form" autocomplete="on">
+
+            <!-- Username -->
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    placeholder="Enter your username"
+                    required
+                    autofocus
+                    autocomplete="username"
+                    spellcheck="false"
+                >
+            </div>
+
+            <!-- Password with show/hide toggle -->
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="password-wrap">
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Enter your password"
+                        required
+                        autocomplete="current-password"
+                    >
+                    <button
+                        type="button"
+                        class="pwd-toggle"
+                        id="pwdToggle"
+                        onclick="togglePassword()"
+                        aria-label="Show password"
+                        title="Show password"
+                    >
+                        <span id="pwdIcon">👁</span>
+                        <span id="pwdText">Show</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Submit -->
+            <button type="submit" class="btn-primary btn-block">
+                Sign In
+            </button>
+
+        </form>
+
+        <!-- ── Footer note ────────────────────────────────── -->
+        <div class="login-footer">
+            <p>
+                Accounts are created by an administrator.<br>
+                Contact your admin if you need access.
+            </p>
+        </div>
+
+    </div>
+
+    <!-- ── Side info panel (desktop only) ─────────────────── -->
+    <div class="login-info">
+        <h2>Track. Trace. Stay Safe.</h2>
+        <p>
+            Log medications, explore real FDA label interaction data,
+            and visualize multi-hop interaction chains using
+            PostgreSQL recursive queries.
+        </p>
+        <ul class="login-features">
+            <li>✅ Real data from OpenFDA &amp; RxNorm</li>
+            <li>🔗 Recursive interaction chain tracing</li>
+            <li>🛡 Admin-verified accounts</li>
+            <li>📊 Interactive graph visualization</li>
+        </ul>
+        <p class="login-disclaimer">
+            <strong>⚠ Clinical Disclaimer:</strong>
+            For educational use only. Always consult a licensed
+            pharmacist or physician for medical decisions.
+        </p>
+    </div>
+
+</div>
+
+<!-- ── Page-scoped CSS (works with your global style.css) ── -->
+<style>
+.login-wrap {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    max-width: 1000px;
+    margin: 3rem auto;
+    padding: 0 1rem;
+    align-items: center;
+}
+@media (min-width: 900px) {
+    .login-wrap { grid-template-columns: 1fr 1fr; }
+}
+
+.login-card {
+    background: var(--bg-card);
+    border: 1px solid #334155;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 20px 40px -10px rgba(0,0,0,0.6);
+}
+
+.login-header { text-align: center; margin-bottom: 1.75rem; }
+.login-logo   { font-size: 2.5rem; line-height: 1; }
+.login-title  {
+    font-size: 1.75rem;
+    margin: 0.5rem 0 0.25rem;
+    color: var(--text-main);
+}
+.login-subtitle {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.form-group { margin-bottom: 1.15rem; }
+.form-group label {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 0.4rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.password-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.password-wrap input {
+    padding-right: 5.25rem;   /* room for the toggle */
+    margin-bottom: 0;
+}
+.pwd-toggle {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: auto;
+    margin: 0;
+    padding: 0.35rem 0.65rem;
+    background: #334155;
+    color: var(--text-main);
+    border: none;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+.pwd-toggle:hover { background: var(--accent); color: #000; }
+
+.btn-primary {
+    background: var(--accent);
+    color: #000;
+    font-weight: 700;
+    border: none;
+    border-radius: 8px;
+    padding: 0.85rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: filter 0.15s, transform 0.05s;
+}
+.btn-primary:hover  { filter: brightness(1.1); }
+.btn-primary:active { transform: translateY(1px); }
+.btn-block { width: 100%; margin-top: 0.5rem; }
+
+.alert {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+.alert-danger  { background: #7f1d1d; color: #fca5a5; border: 1px solid #991b1b; }
+.alert-success { background: #14532d; color: #86efac; border: 1px solid #166534; }
+
+.login-footer {
+    margin-top: 1.5rem;
+    text-align: center;
+    border-top: 1px solid #334155;
+    padding-top: 1rem;
+}
+.login-footer p {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* Right-side info panel */
+.login-info { padding: 1rem; }
+.login-info h2 {
+    color: var(--accent);
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+.login-info p {
+    color: var(--text-muted);
+    line-height: 1.7;
+    margin-bottom: 1rem;
+}
+.login-features {
+    list-style: none;
+    padding: 0;
+    margin: 1.25rem 0;
+}
+.login-features li {
+    padding: 0.4rem 0;
+    color: var(--text-main);
+    font-size: 0.95rem;
+}
+.login-disclaimer {
+    margin-top: 1.5rem;
+    padding: 0.85rem 1rem;
+    background: #1e293b;
+    border-left: 3px solid #f59e0b;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    line-height: 1.55;
+}
+.login-disclaimer strong { color: #fbbf24; }
+
+/* Hide the info panel on small screens */
+@media (max-width: 899px) {
+    .login-info { display: none; }
+    .login-wrap { margin: 1.5rem auto; }
+    .login-card { padding: 1.5rem; }
+}
+</style>
+
+<!-- ── Password visibility toggle logic ───────────────── -->
+<script>
+function togglePassword() {
+    const input = document.getElementById('password');
+    const icon  = document.getElementById('pwdIcon');
+    const text  = document.getElementById('pwdText');
+    const btn   = document.getElementById('pwdToggle');
+
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.textContent = '🙈';
+        text.textContent = 'Hide';
+        btn.setAttribute('aria-label', 'Hide password');
+        btn.setAttribute('title', 'Hide password');
+    } else {
+        input.type = 'password';
+        icon.textContent = '👁';
+        text.textContent = 'Show';
+        btn.setAttribute('aria-label', 'Show password');
+        btn.setAttribute('title', 'Show password');
+    }
+}
+</script>
