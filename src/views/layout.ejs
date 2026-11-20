@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedGraph Explorer</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+</head>
+<body>
+    <nav style="padding: 1rem 2rem; background: #1e293b; display: flex; justify-content: space-between; align-items:center;">
+        <h2 style="font-size:1.1rem;">🩺 MedGraph <span style="font-size:0.75rem; color:var(--accent);">Interaction Explorer</span></h2>
+        <div>
+            <% if (typeof user !== 'undefined' && user) { %>
+                <span style="color:var(--text-muted);">👤 <%= user %></span>
+                &nbsp;|&nbsp;
+                <a href="/logout" style="color:var(--danger);">Logout</a>
+            <% } %>
+        </div>
+    </nav>
+    <div class="container">
+        <%- body %>   <!-- injected by express-ejs-layouts -->
+    </div>
+</body>
+</html>
