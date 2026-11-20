@@ -1,0 +1,69 @@
+<div class="grid">
+    <!-- Sidebar: Add Med / Select -->
+    <div class="card">
+        <h3>Add Medication</h3>
+        <form action="/explorer/add-medication" method="POST">
+            <input type="text" name="name" placeholder="e.g., Warfarin" required>
+            <button type="submit">Fetch & Save from FDA</button>
+        </form>
+        <hr style="margin: 1.5rem 0; border-color: #334155;">
+        <h3>View Interaction Chain</h3>
+        <form action="/explorer/chain/0" method="GET" onsubmit="this.action = '/explorer/chain/' + this.drugId.value">
+            <select name="drugId" required>
+                <option value="">Select a Drug...</option>
+                <% meds.forEach(m => { %>
+                    <option value="<%= m.id %>"><%= m.name %></option>
+                <% }); %>
+            </select>
+            <button type="submit">Trace Chain (Recursive)</button>
+        </form>
+    </div>
+
+    <!-- Main: Graph or Results -->
+    <div class="card" style="grid-column: span 2;">
+        <% if (chains && chains.length > 0) { %>
+            <h3>Interaction Chain starting from: <%= selectedDrug.name %></h3>
+            <div id="network" style="height: 500px; width: 100%; border: 1px solid #334155;"></div>
+            <script>
+                const nodesData = [];
+                const edgesData = [];
+                const addedNodes = new Set();
+                
+                // Add the root node
+                nodesData.push({ id: <%= selectedDrug.id %>, label: "<%= selectedDrug.name %>", color: '#10b981' });
+                addedNodes.add(<%= selectedDrug.id %>);
+
+                <% chains.forEach(c => { %>
+                    // Add nodes if not exists
+                    if (!addedNodes.has(<%= c.drug_id %>)) {
+                        nodesData.push({ id: <%= c.drug_id %>, label: "<%= c.drug_name %>" });
+                        addedNodes.add(<%= c.drug_id %>);
+                    }
+                    <% if (c.interacts_with_id) { %>
+                        if (!addedNodes.has(<%= c.interacts_with_id %>)) {
+                            nodesData.push({ id: <%= c.interacts_with_id %>, label: "<%= c.interacts_with_name %>" });
+                            addedNodes.add(<%= c.interacts_with_id %>);
+                        }
+                        // Edge logic based on severity color
+                        let color = "<%= c.severity === 'major' ? '#ef4444' : c.severity === 'moderate' ? '#f59e0b' : '#10b981' %>";
+                        edgesData.push({ 
+                            from: <%= c.drug_id %>, 
+                            to: <%= c.interacts_with_id %>, 
+                            label: "<%= c.severity %>",
+                            color: { color: color },
+                            arrows: 'to'
+                        });
+                    <% } %>
+                <% }); %>
+
+                const container = document.getElementById('network');
+                const data = { nodes: new vis.DataSet(nodesData), edges: new vis.DataSet(edgesData) };
+                new vis.Network(container, data, { physics: true, edges: { smooth: true } });
+            </script>
+        <% } else if (selectedDrug) { %>
+            <p>No interaction chains found for this drug. The FDA label may not list specific interactions.</p>
+        <% } else { %>
+            <p style="color: var(--text-muted);">Select a drug to visualize the interaction graph.</p>
+        <% } %>
+    </div>
+</div>
